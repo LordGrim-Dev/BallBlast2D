@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Game.Common;
 using UnityEngine;
@@ -7,7 +8,6 @@ namespace BallBlast
 {
     public class BBBulletManager : SingletonObserverBase<BBBulletManager>
     {
-
         ObjectPoolManager<BBBullet> m_BulletPoolManager;
 
         public void Init(BBBulletManagerMB inInstance)
@@ -25,10 +25,9 @@ namespace BallBlast
         public double GetEndPointYPosition()
         {
             float extraOffset = 5;
-            double endPointY = BBScreenBorderHandler.Instance().Top + extraOffset;
+            double endPointY = BBScreenSize.Instance().Top + extraOffset;
             return endPointY;
         }
-
 
 
         public float GetBulletTravelSpeed()
@@ -49,11 +48,23 @@ namespace BallBlast
         {
             BBBullet bullet = null;
 
-            bullet = m_BulletPoolManager.GetObjectFromPool() as BBBullet;
+            bullet = m_BulletPoolManager.GetNewBallFromPool() as BBBullet;
 
             bullet.transform.position = inPos;
 
             return bullet;
+        }
+
+        internal bool IsBullet(int inItemID, out uint outDamage)
+        {
+            outDamage = 0;
+            bool isBullet = m_BulletPoolManager.IsItemPresentInPool(inItemID);
+            if (isBullet)
+            {
+                outDamage = 1;// Need to CHange based one Bullet update
+            }
+
+            return isBullet;
         }
     }
 }

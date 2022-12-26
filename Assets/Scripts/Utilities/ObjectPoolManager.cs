@@ -8,7 +8,7 @@ namespace Game.Common
 {
     public class ObjectPoolManager<T> where T : IPoolMember
     {
-        HashSet<IPoolMember> m_ObjectPool;
+        Dictionary<int, IPoolMember> m_ObjectPool;
 
         IPoolMember m_Prefab = null;
         Transform m_Parent;
@@ -18,10 +18,10 @@ namespace Game.Common
             m_Prefab = inPrefab;
             m_Parent = inParent;
 
-            m_ObjectPool = new HashSet<IPoolMember>();
+            m_ObjectPool = new Dictionary<int, IPoolMember>();
         }
 
-        public IPoolMember GetObjectFromPool()
+        public IPoolMember GetNewBallFromPool()
         {
             IPoolMember poolMember = null;
 
@@ -29,16 +29,16 @@ namespace Game.Common
 
             foreach (var poolItem in m_ObjectPool)
             {
-                if (!poolItem.IsInUse)
+                if (!poolItem.Value.IsInUse)
                 {
-                    poolMember = poolItem;
+                    poolMember = poolItem.Value;
                 }
             }
 
             if (poolMember == null)
             {
                 IPoolMember newMember = GetNewPoolMember();
-                m_ObjectPool.Add(newMember);
+                m_ObjectPool.Add(newMember.ID, newMember);
                 poolMember = newMember;
             }
 
@@ -55,8 +55,8 @@ namespace Game.Common
             var newObj = GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Parent);
 
             newMember = newObj.GetComponent<IPoolMember>();
-            
-            newMember.Init();
+
+            newMember.OnCreated();
 
             return newMember;
         }
@@ -67,5 +67,11 @@ namespace Game.Common
             m_ObjectPool = null;
         }
 
+        public bool IsItemPresentInPool(int inID)
+        {
+            m_ObjectPool.TryGetValue(inID, out IPoolMember member);
+
+            return (member != null);
+        }
     }
 }

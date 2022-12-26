@@ -22,9 +22,17 @@ namespace BallBlast
         [SerializeField]
         BBCommonRefHolderMB m_CommonRefHolderMB;
 
+        [SerializeField]
+        BBBallManagerMB m_BallManagerMB;
+
+        [SerializeField]
+        BBBorderRefHolderMB m_BorderRefHolderMB;
+
         public BBPlayerControlMB PlayerController { get => m_PlayerController; }
         public BBBulletManagerMB BulletManagerMB { get => m_BulletManagerMB; }
         public BBCommonRefHolderMB CommonRefHolderMB { get => m_CommonRefHolderMB; }
+        public BBBallManagerMB BallManagerMB { get => m_BallManagerMB; }
+        public BBBorderRefHolderMB BorderRefHolderMB { get => m_BorderRefHolderMB; }
 
         private void Awake()
         {

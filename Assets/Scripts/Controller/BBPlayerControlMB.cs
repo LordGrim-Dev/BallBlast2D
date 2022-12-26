@@ -16,10 +16,7 @@ namespace BallBlast
 
         private float m_FireCooldownTime;
 
-        [SerializeField]
         private bool m_FireAllowed;
-
-
 
         public void Init()
         {
@@ -100,7 +97,7 @@ namespace BallBlast
 
             float nextPos = Mathf.Abs(inMousePos.x);
 
-            float BorderX = Mathf.Abs((float)BBScreenBorderHandler.Instance().LeftBorder);
+            float BorderX = Mathf.Abs((float)BBScreenSize.Instance().Left);
 
             float roundedPosition = BorderX - halfWidth;
 

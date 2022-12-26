@@ -14,14 +14,16 @@ namespace BallBlast
         {
             base.Init();
             InputManager.Instance();
-            BBScreenBorderHandler.Instance();
+            BBScreenSize.Instance();
 
 
             BBManagerMediator mediator = BBManagerMediator.Instance();
             mediator.PlayerController.Init();
             mediator.BulletManagerMB.Init();
+            mediator.BallManagerMB.Init();
+            mediator.BorderRefHolderMB.Init();
 
-            BBScreenBorderHandler.Instance().Init(mediator.CommonRefHolderMB.MainCamera);
+            BBScreenSize.Instance().Init(mediator.CommonRefHolderMB.MainCamera);
         }
 
         public void StartGame()

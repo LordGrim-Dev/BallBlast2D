@@ -10,6 +10,8 @@ namespace BallBlast
 
         public bool IsInUse => m_IsInUse;
 
+        int IPoolMember.ID => transform.GetInstanceID();
+
         public void Show()
         {
             gameObject.SetActive(true);
@@ -27,10 +29,16 @@ namespace BallBlast
             gameObject.SetActive(false);
         }
 
-        public void Init()
+        public void OnCreated()
         {
             m_IsInUse = false;
             gameObject.SetActive(false);
         }
+
+
+        // private void OnTriggerEnter2D(Collider2D other)
+        // {
+        //     Hide();
+        // }
     }
 }
