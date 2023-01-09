@@ -18,6 +18,26 @@ namespace BallBlast
         public void Init(Camera inMainCamera)
         {
             CacheBorderValues(inMainCamera);
+            UpdateScreenBGSize(inMainCamera);
+        }
+
+        private void UpdateScreenBGSize(Camera inMainCamera)
+        {
+            var screenBgTransform = BBManagerMediator.Instance().CommonRefHolderMB.BGSprite;
+
+            Vector2 scale = Vector2.one;
+
+            var bound = screenBgTransform.GetComponent<SpriteRenderer>().bounds.size;
+
+            // For Camera shake 
+            float extraOffset = 1.5f;
+            float extraYOffset = 0.25f;
+
+            scale.x = (m_Right * 2 / bound.x) + extraOffset;
+
+            scale.y = (m_Top * 2 / bound.y) + extraYOffset;
+
+            screenBgTransform.localScale = scale;
         }
 
         private void CacheBorderValues(Camera inMainCamera)

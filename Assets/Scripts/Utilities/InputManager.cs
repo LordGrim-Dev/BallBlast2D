@@ -10,16 +10,26 @@ namespace Game.Common
     {
         private event Action<SwipeDirection, float> m_TouchUpdate;
         private event Action m_MouseDownEvent;
+        private event Action m_MouseClickAndHoldEvent;
         private event Action m_MouseUpEvent;
         private event Action<Vector2> m_MousePositionUpdateEvent;
 
         private Vector2 m_FingerDownPos, m_FingerUpPos, m_PreviousMousePostion;
 
         private SwipeDirection m_PreviousSwipeDir;
+        private bool m_IsGamePause, m_IsGameOver;
 
         public override void Init()
         {
             base.Init();
+            m_IsGamePause = m_IsGameOver = false;
+
+            BallBlast.Events.GameEventManager.Instance().OnGameOver -= () => m_IsGameOver = true;
+            BallBlast.Events.GameEventManager.Instance().OnGameOver += () => m_IsGameOver = true;
+
+            BallBlast.Events.GameEventManager.Instance().OnGamePause -= (status) => m_IsGamePause = status;
+            BallBlast.Events.GameEventManager.Instance().OnGamePause += (status) => m_IsGamePause = status;
+
             m_FingerDownPos = m_PreviousMousePostion = m_FingerUpPos = Vector2.zero;
             m_PreviousSwipeDir = SwipeDirection.none;
         }
@@ -27,13 +37,13 @@ namespace Game.Common
         public void OnUpdate()
         {
 
-            if (EventSystem.current == null || EventSystem.current.IsPointerOverGameObject()) return;
+            if (EventSystem.current == null || EventSystem.current.IsPointerOverGameObject() || m_IsGamePause|| m_IsGameOver) return;
 
             // TouchDevices (); // Enable based on touch swipe is required
 
             MouseClikEventDetection();
             MousePositionUpdate();
-            
+
 #if UNITY_EDITOR
             NonTouchDevices();
 #endif
@@ -85,16 +95,23 @@ namespace Game.Common
             m_MousePositionUpdateEvent -= inCallBack;
         }
 
-        public void SubscribeToMouseEvent(Action inOnMouseDown, Action inOnMouseUp)
+        internal void PauseUpdate(bool inPause)
+        {
+            m_IsGamePause = inPause;
+        }
+
+        public void SubscribeToMouseEvent(Action inOnMouseDown, Action inOnMouseUp, Action inMouseClickAndHold)
         {
             m_MouseDownEvent += inOnMouseDown;
             m_MouseUpEvent += inOnMouseUp;
+            m_MouseClickAndHoldEvent += inMouseClickAndHold;
         }
 
-        public void UnSubscribeToMouseEvent(Action inOnMouseDown, Action inOnMouseUp)
+        public void UnSubscribeToMouseEvent(Action inOnMouseDown, Action inOnMouseUp, Action inMouseClickAndHold)
         {
             m_MouseDownEvent -= inOnMouseDown;
             m_MouseUpEvent -= inOnMouseUp;
+            m_MouseClickAndHoldEvent -= inMouseClickAndHold;
         }
 
         #endregion
@@ -108,11 +125,16 @@ namespace Game.Common
 #endif
             if (Input.GetMouseButtonUp(0))
             {
-                InvokeMouseEvent(UtilityConstants.MOUSE_UP);
+                m_MouseUpEvent?.Invoke();
             }
             if (Input.GetMouseButtonDown(0))
             {
-                InvokeMouseEvent(UtilityConstants.MOUSE_DOWN);
+                m_MouseDownEvent?.Invoke();
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                m_MouseClickAndHoldEvent?.Invoke();
             }
         }
         private void MouseSwipeDetection()
@@ -139,18 +161,6 @@ namespace Game.Common
                 DetectSwipe();
             }
         }
-
-        private void InvokeMouseEvent(int inMOUSE_UP)
-        {
-            if (inMOUSE_UP == 1)
-            {
-                m_MouseUpEvent?.Invoke();
-            }
-            else
-                m_MouseDownEvent?.Invoke();
-        }
-
-
         #endregion
 
         #region  KEY_BOARD INPUT

@@ -9,6 +9,7 @@ namespace Game.Common
 
         public const int MOUSE_UP = 1;
         public const int MOUSE_DOWN = 0;
+        public const int MOUSE_CLICK_AND_HOLD = 3;
 #if UNITY_ANDROID
         public const float SWIPE_THRESHOLD = 1f;
 #else

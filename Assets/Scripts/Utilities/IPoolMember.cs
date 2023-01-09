@@ -13,4 +13,6 @@ public interface IPoolMember
 
     //Called when object is been created
     void OnCreated();
+
+    void OnPause(bool inPauseStatus);
 }

@@ -1,0 +1,44 @@
+{
+    "localisation_details": {
+        "en": {
+            "game_over": "Game Over",
+            "score": "Score",
+            "clk_t_ext": "Click here to Exit...",
+            "clk_t_continue": "Click here to Continue...",
+            "level": "Level - {0}"
+        }
+    },
+    "game_settings": {
+        "total_lives": 3,
+        "score_mult": 1,
+        "level_data": {
+            "1": {
+                "max_count": 200,
+                "ball_size_prob": [
+                    20,
+                    50,
+                    30,
+                    0
+                ]
+            },
+            "2": {
+                "max_count": 1000,
+                "ball_size_prob": [
+                    20,
+                    10,
+                    30,
+                    40
+                ]
+            },
+            "3": {
+                "max_count": 750,
+                "ball_size_prob": [
+                    50,
+                    10,
+                    20,
+                    20
+                ]
+            }
+        }
+    }
+}

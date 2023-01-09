@@ -1,14 +1,15 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 namespace Game.Common
 {
     public class GameUtilities
     {
-        internal static void ShowLog(string inMessage)
+        internal static void ShowLog(object inMessage)
         {
 #if DEBUG || UNITY_EDITOR
-            Debug.Log("[DEBUG] : " + inMessage);
+            Debug.Log($"[DEBUG] : {inMessage}");
 #endif
         }
 
@@ -52,6 +53,21 @@ namespace Game.Common
             return null;
         }
 
+        internal static void SaveToFile(string inFileName, string jsonStr)
+        {
+            string fullPath = Application.persistentDataPath + inFileName;
+            if (!File.Exists(fullPath)) File.Create(fullPath);
+            File.WriteAllText(fullPath, jsonStr);
+        }
 
+        internal static string LoadFromFile(string inFIleName)
+        {
+            string content = "";
+            string fullPath = Application.persistentDataPath + inFIleName;
+            if (File.Exists(fullPath))
+                content = File.ReadAllText(fullPath);
+
+            return content;
+        }
     }
 }

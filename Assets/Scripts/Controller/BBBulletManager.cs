@@ -13,6 +13,17 @@ namespace BallBlast
         public void Init(BBBulletManagerMB inInstance)
         {
             m_BulletPoolManager = new ObjectPoolManager<BBBullet>(inInstance.BulletPrefab, inInstance.transform);
+
+            Events.GameEventManager.Instance().OnGamePause -= PauseAll;
+            Events.GameEventManager.Instance().OnGamePause += PauseAll;
+
+            Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
+            Events.GameEventManager.Instance().OnGameOver += OnGameOver;
+        }
+
+        private void OnGameOver()
+        {
+            PauseAll(true);
         }
 
         public BBBullet GetNewBullet(Vector3 inPosition)
@@ -44,6 +55,12 @@ namespace BallBlast
             m_BulletPoolManager = null;
         }
 
+        internal uint GetBulletDamage()
+        {
+            // for now sending 1 as bullet damage
+            return 1;
+        }
+
         public BBBullet GetFreeBulletFromPool(Vector3 inPos)
         {
             BBBullet bullet = null;
@@ -57,14 +74,26 @@ namespace BallBlast
 
         internal bool IsBullet(int inItemID, out uint outDamage)
         {
-            outDamage = 0;
-            bool isBullet = m_BulletPoolManager.IsItemPresentInPool(inItemID);
+            outDamage = 1;
+            bool isBullet = m_BulletPoolManager.IsItemPresentInPool(inItemID, out IPoolMember bullet);
             if (isBullet)
             {
-                outDamage = 1;// Need to CHange based one Bullet update
+                BBBullet castedBullet = bullet as BBBullet;
+                outDamage = castedBullet.BulletDamage;
+                HideThisBullet(inItemID, bullet);
             }
-
             return isBullet;
+        }
+
+        private void HideThisBullet(int inItemID, IPoolMember bullet)
+        {
+            if (bullet != null)
+                bullet.Hide();
+        }
+
+        public void PauseAll(bool inPauseStatus)
+        {
+            m_BulletPoolManager.OnPause(inPauseStatus);
         }
     }
 }

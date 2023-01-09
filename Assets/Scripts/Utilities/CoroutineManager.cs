@@ -7,23 +7,21 @@ namespace Game.Common
 {
     public class CoroutineManager : MonoBehaviour
     {
-        private static CoroutineManager _instance = null;
-
         private bool m_IsDestroyed;
         void Awake()
         {
-            if (_instance == null)
-
-                _instance = this;
-
-            else if (_instance != this)
-
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
                 Destroy(gameObject);
-
+            }
             DontDestroyOnLoad(gameObject);
         }
 
-        public static CoroutineManager Instance { get { return _instance; } }
+        public static CoroutineManager Instance { get; private set; } = null;
 
         public delegate bool CoroutineCondition();
 
@@ -40,10 +38,16 @@ namespace Game.Common
 
         public void StopMyCoroutine(Coroutine coroutine)
         {
-            if (!m_IsDestroyed)
+            if (!m_IsDestroyed && coroutine != null)
             {
                 StopCoroutine(coroutine);
             }
+#if DEBUG
+            else
+            {
+                GameUtilities.ShowLog(" NULL or Object is already been destroyed");
+            }
+#endif
         }
 
 
@@ -71,7 +75,6 @@ namespace Game.Common
             yield return new WaitForEndOfFrame(); //if delay is 0
 
             inOnComplete?.Invoke();
-
         }
 
     }

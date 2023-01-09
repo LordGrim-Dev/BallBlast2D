@@ -8,6 +8,7 @@ namespace Game.Common
 {
     public class ObjectPoolManager<T> where T : IPoolMember
     {
+        int m_ItemCOunter;
         Dictionary<int, IPoolMember> m_ObjectPool;
 
         IPoolMember m_Prefab = null;
@@ -15,6 +16,7 @@ namespace Game.Common
 
         public ObjectPoolManager(IPoolMember inPrefab, Transform inParent)
         {
+            m_ItemCOunter = 0;
             m_Prefab = inPrefab;
             m_Parent = inParent;
 
@@ -54,9 +56,13 @@ namespace Game.Common
 
             var newObj = GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity, m_Parent);
 
+            newObj.name += "_" + m_ItemCOunter;
+
             newMember = newObj.GetComponent<IPoolMember>();
 
             newMember.OnCreated();
+
+            m_ItemCOunter++;
 
             return newMember;
         }
@@ -67,11 +73,24 @@ namespace Game.Common
             m_ObjectPool = null;
         }
 
-        public bool IsItemPresentInPool(int inID)
+        public bool IsItemPresentInPool(int inID, out IPoolMember outMemeber)
+        {
+            m_ObjectPool.TryGetValue(inID, out outMemeber);
+
+            return (outMemeber != null);
+        }
+
+        internal void OnPause(bool inPauseStatus)
+        {
+            foreach (var mem in m_ObjectPool)
+                mem.Value?.OnPause(inPauseStatus);
+        }
+
+        public IPoolMember GetPooledMemberByTransformID(int inID)
         {
             m_ObjectPool.TryGetValue(inID, out IPoolMember member);
 
-            return (member != null);
+            return member;
         }
     }
 }

@@ -9,25 +9,101 @@ namespace BallBlast
 {
     public class BBPlayerControlMB : MonoBehaviour
     {
+
         [SerializeField]
-        Transform m_BulletPivotTransform;
+        private Transform m_BulletPivotTransform;
 
         private float m_MaxPlayerBound;
 
+        [SerializeField]
         private float m_FireCooldownTime;
+
+        [SerializeField]
+        SpriteRenderer m_PlayerBase, m_GunPoint;
+
+        [SerializeField]
 
         private bool m_FireAllowed;
 
+        private int m_PlayerTotalLives;
+
+        Tween m_PlayerBaseBlink, m_GunBaseBlink;
+
         public void Init()
         {
-            m_FireCooldownTime = 0;
+            m_FireCooldownTime = BBConstants.k_MAX_FIRE_COOLDOWN;
             m_FireAllowed = false;
-            CoroutineManager.Instance.StartCoroutine(CheckAndFireBullet());
-            InputManager.Instance().SubscribeToMouseEvent(OnMouseDownEvent, OnMouseUpEvet);
-            InputManager.Instance().SubscribeToGetMousePosition(OnMousePositionUpdate);
 
             BoxCollider2D playerCollider = transform.GetComponent<BoxCollider2D>();
             m_MaxPlayerBound = playerCollider.bounds.size.x;
+
+            InputManager.Instance().SubscribeToMouseEvent(OnMouseDownEvent, OnMouseUpEvet, OnMouseClickAndHold);
+            InputManager.Instance().SubscribeToGetMousePosition(OnMousePositionUpdate);
+
+            Events.GameEventManager.Instance().OnGamePause -= EnablePlayerControl;
+            Events.GameEventManager.Instance().OnGamePause += EnablePlayerControl;
+
+            Events.GameEventManager.Instance().OnGameStarted -= ResumePlayerControl;
+            Events.GameEventManager.Instance().OnGameStarted += ResumePlayerControl;
+
+            Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
+            Events.GameEventManager.Instance().OnGameOver += OnGameOver;
+
+            m_PlayerTotalLives = config.BBConfigManager.Instance().GameSetting.MaxLives;
+            Events.UI.UIEventManager.Instance().TriggerPlayerLivesUpdate(m_PlayerTotalLives);
+
+            Color endColor = m_PlayerBase.color;
+            endColor.a = 0.5f;
+            float duration = 0.55f;
+
+            m_PlayerBaseBlink = m_PlayerBase.DOColor(endColor, duration)
+                .OnComplete(() =>
+                {
+                    endColor.a = 1;
+                    m_PlayerBase.color = endColor;
+                }).SetLoops(-1).SetEase(Ease.Linear);
+
+
+            endColor = Color.white;
+            endColor.a = 0.5f;
+
+            m_GunBaseBlink = m_GunPoint.DOColor(endColor, duration)
+                .OnComplete(() =>
+                {
+                    endColor.a = 1;
+                    m_GunPoint.color = endColor;
+                }).SetLoops(-1).SetEase(Ease.Linear);
+
+            m_PlayerBaseBlink.Pause();
+            m_GunBaseBlink.Pause();
+        }
+
+        private void OnGameOver()
+        {
+            EnablePlayerControl(false);
+        }
+
+        private void OnMouseClickAndHold()
+        {
+            bool isGamePause = BBGameManager.Instance().IsGamePause;
+            bool isGameOver = BBGameManager.Instance().IsGameOver;
+
+            if (isGamePause || !m_FireAllowed || isGameOver) return;
+
+            if (m_FireCooldownTime <= 0)
+            {
+                m_FireCooldownTime = BBConstants.k_MAX_FIRE_COOLDOWN; ;
+                FireBullet();
+            }
+            else
+            {
+                m_FireCooldownTime -= Time.deltaTime;
+            }
+        }
+
+        private void ResumePlayerControl()
+        {
+            m_FireAllowed = true;
         }
 
         private void OnMousePositionUpdate(Vector2 inMousePos)
@@ -38,7 +114,6 @@ namespace BallBlast
             UpdatePlayerX(cappedPostion);
         }
 
-
         private void UpdatePlayerX(float inDistance)
         {
             float moveSpeed = 0.10f;
@@ -48,12 +123,7 @@ namespace BallBlast
         private void OnMouseUpEvet()
         {
             EnablePlayerControl(false);
-            ResetFireCoolDown();
-        }
-
-        private void ResetFireCoolDown()
-        {
-            m_FireCooldownTime = BBConstants.KMAX_FIRE_COOLDOWN;
+            m_FireCooldownTime = BBConstants.k_MAX_FIRE_COOLDOWN;
         }
 
         private void OnMouseDownEvent()
@@ -64,25 +134,6 @@ namespace BallBlast
         public void EnablePlayerControl(bool inENable)
         {
             m_FireAllowed = inENable;
-        }
-
-        private IEnumerator CheckAndFireBullet()
-        {
-            while (true)
-            {
-                if (m_FireAllowed && m_FireCooldownTime <= 0)
-                {
-                    m_FireCooldownTime = BBConstants.KMAX_FIRE_COOLDOWN; ;
-                    FireBullet();
-                }
-                else
-                {
-                    if (m_FireCooldownTime > 0)
-                        m_FireCooldownTime -= 0.25f;
-                }
-
-                yield return null;
-            }
         }
 
         private void FireBullet()
@@ -109,9 +160,68 @@ namespace BallBlast
             return roundedPosition;
         }
 
+        public void OnLivesLost()
+        {
+            m_PlayerTotalLives--;
+
+            EnablePlayerControl(false);
+
+            transform.GetComponent<BoxCollider2D>().enabled = false;
+
+            Events.GameEventManager.Instance().TriggerPlayerLifeLost(m_PlayerTotalLives);
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            bool isBallHit = BBBallManager.Instance().IsHitBallID(collision.transform.GetInstanceID());
+            if (isBallHit)
+            {
+                OnLivesLost();
+            }
+        }
+
+        public void OnCountDownZero()
+        {
+            EnablePlayerControl(true);
+
+            DOVirtual.DelayedCall(BBConstants.k_RESPAWN_COOLDOWN_TIME, OnRespawn)
+                .OnStart(() => BlinkAnimation(true));
+        }
+
+        private void BlinkAnimation(bool inEnable)
+        {
+            if (inEnable)
+            {
+                m_PlayerBaseBlink.Play();
+                m_GunBaseBlink.Play();
+            }
+            else
+            {
+                var originalColor = m_PlayerBase.color;
+                originalColor.a = 1;
+
+                m_PlayerBase.color = originalColor;
+
+                originalColor = Color.white;
+                originalColor.a = 1;
+
+                m_GunPoint.color = originalColor;
+
+                m_PlayerBaseBlink.Pause();
+                m_GunBaseBlink.Pause();
+
+            }
+        }
+
+        private void OnRespawn()
+        {
+            BlinkAnimation(false);
+            transform.GetComponent<BoxCollider2D>().enabled = true;
+        }
+
         private void OnDestroy()
         {
-            InputManager.Instance().UnSubscribeToMouseEvent(OnMouseDownEvent, OnMouseUpEvet);
+            InputManager.Instance().UnSubscribeToMouseEvent(OnMouseDownEvent, OnMouseUpEvet, OnMouseClickAndHold);
             InputManager.Instance().UnSubscribeToGetMousePosition(OnMousePositionUpdate);
         }
     }
