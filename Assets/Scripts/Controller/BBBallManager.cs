@@ -20,9 +20,11 @@ namespace BallBlast
         // These two variable used to monitor level up
         // Max-Count = maximum count for the level to clear up
         // will be distributed among balls with distribution
-        private int m_MaxCountForTheLevel, m_CurrentCount;
+        private uint m_MaxCountForTheLevel, m_CurrentLevelDrawCountPending;
         private uint[] m_BallSizeProbabality;
         Coroutine m_CheckAndSpawnParent;
+
+        bool m_IsLevelUpRequired;
 
         public void Init(BBBallManagerMB inInstance)
         {
@@ -35,6 +37,7 @@ namespace BallBlast
             m_SpawnTimeGap = BBConstants.k_MAX_SPAWN_TIME_GAP;
 
             m_IsGamePaused = false;
+            m_IsLevelUpRequired = false;
 
             Events.GameEventManager.Instance().OnGamePause -= OnPauseGame;
             Events.GameEventManager.Instance().OnGamePause += OnPauseGame;
@@ -65,8 +68,10 @@ namespace BallBlast
         private void CacheCurrentLevelData()
         {
             var currentLevelD = BBGameManager.Instance().GetCurrentLevelData();
+
             m_MaxCountForTheLevel = currentLevelD.MaxCount;
             m_BallSizeProbabality = currentLevelD.BallSizeProbability;
+            m_CurrentLevelDrawCountPending = m_MaxCountForTheLevel;
         }
 
         private void OnPauseGame(bool pauseStatus)
@@ -89,7 +94,9 @@ namespace BallBlast
             {
                 if (m_IsGamePaused) yield return null;
 
-                nextSpawnIsRequired = m_TotalParentBallOnScreen < BBConstants.k_MAX_PARENT_BALLS_ON_SCREEN;
+                m_IsLevelUpRequired = !(m_CurrentLevelDrawCountPending > 1);
+
+                nextSpawnIsRequired = m_TotalParentBallOnScreen < BBConstants.k_MAX_PARENT_BALLS_ON_SCREEN && !m_IsLevelUpRequired;
                 if (nextSpawnIsRequired)
                 {
                     if (m_SpawnTimeGap <= 0)
@@ -112,11 +119,15 @@ namespace BallBlast
 
             IBallProperties ballProperties = newBall as IBallProperties;
 
-            ballProperties.InitialiseNewBall(GetMaxHitCount(), randomPosition, GetNextBallSize(), 0);
+            uint nextParentBallHit = GetMaxHitCount();
+
+            m_CurrentLevelDrawCountPending -= nextParentBallHit;
+
+            ballProperties.InitialiseNewBall(nextParentBallHit, randomPosition, GetNextBallSize(), 0);
         }
 
 
-        public Vector3 GetBallSpawnPoint()
+        private Vector3 GetBallSpawnPoint()
         {
             var commonRefHolder = BBManagerMediator.Instance().CommonRefHolderMB;
             int totalRandomPositions = commonRefHolder.BallSpawnPoints.SpawnPoint.Length;
@@ -136,6 +147,13 @@ namespace BallBlast
                 m_TotalParentBallOnScreen--;
                 if (m_TotalParentBallOnScreen <= 0) m_TotalParentBallOnScreen = 0;
             }
+
+            int parentballCount = m_ParentBallPool.GetAllEnabledPoolMemberCount();
+            int childCountsEnabled = m_SplitBallPool.GetAllEnabledPoolMemberCount();
+            bool levelCompleted = (parentballCount == 0 && childCountsEnabled == 0);
+
+            if (levelCompleted)
+                Events.GameEventManager.Instance().TriggerLevelCompleted();
         }
 
         internal void CheckHitBorderAndGetDir(Transform transform, BallSize currentBallSizeLevel, out Direction whichBorder)
@@ -192,12 +210,13 @@ namespace BallBlast
                     IBallProperties ballProperties = newBall as IBallProperties;
 
                     Vector3 postion = inParentPos;
+
+                    xVelocity = BBConstants.k_SPLIT_BALL_INIT_X_VELOCITY;
+
                     if (toLeft)
                     {
-                        xVelocity = -4;
+                        xVelocity = -BBConstants.k_SPLIT_BALL_INIT_X_VELOCITY;
                     }
-                    else
-                        xVelocity = 4;
 
                     postion.z = GetZOrderValue();
 
@@ -259,7 +278,7 @@ namespace BallBlast
         private uint GetMaxHitCount()
         {
             uint nextBallHitCount;
-            nextBallHitCount = (uint)UnityEngine.Random.Range(1, m_MaxCountForTheLevel);
+            nextBallHitCount = (uint)UnityEngine.Random.Range(2, m_CurrentLevelDrawCountPending);
             return nextBallHitCount;
         }
 

@@ -28,7 +28,9 @@ namespace Game.Common
 
         public void Register(ISingltonMember inMember)
         {
+#if UNITY_EDITOR
             GameUtilities.ShowLog($"REGISTER+ :{inMember.GetType().Name}");
+#endif
             if (!m_SingleTonClassList.Contains(inMember))
             {
                 m_SingleTonClassList.Add(inMember);
@@ -55,7 +57,9 @@ namespace Game.Common
         {
             foreach (ISingltonMember member in m_SingleTonClassList)
             {
+#if UNITY_EDITOR
                 GameUtilities.ShowLog($"OnDestroy+ :{member.GetType().Name}");
+#endif
                 member?.OnDestroy();
             }
         }

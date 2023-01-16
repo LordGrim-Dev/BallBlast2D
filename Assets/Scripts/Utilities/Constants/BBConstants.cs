@@ -13,11 +13,13 @@ namespace Game.Common
 
         public const int k_MAX_PARENT_BALLS_ON_SCREEN = 1;
 
+        public const int k_SPLIT_BALL_INIT_X_VELOCITY = 4;
+
         public const uint k_SPLIT_BALL_ID = 1002;
         public const uint k_PARENT_BALL_ID = 1001;
 
         public const string CONFIG_FILE_NAME = "ball_blast_level_data";
-        
+
         public const string CONFIG_PLAYR_PRGRSS = "ball_blast_p_prog.json";
 
         public const string K_UI_PREFAB_PATH = "Prefabs/UI/";

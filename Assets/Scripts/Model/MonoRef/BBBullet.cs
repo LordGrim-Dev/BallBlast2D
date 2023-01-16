@@ -21,6 +21,9 @@ namespace BallBlast
 
             float time = 0.70f;
             float topBorder = (float)BBBulletManager.Instance().GetEndPointYPosition();
+            
+            DOTween.Kill(ID);
+            
             m_BulletMovingTween = transform.DOMoveY(topBorder, time, false)
                 .SetEase(Ease.Linear)
                 .SetId(ID).OnComplete(Hide);

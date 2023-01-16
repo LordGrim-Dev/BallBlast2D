@@ -92,5 +92,16 @@ namespace Game.Common
 
             return member;
         }
+
+        public int GetAllEnabledPoolMemberCount()
+        {
+            int numberOfPoolMembersNotHidden = 0;
+            int n = m_ObjectPool.Count;
+            for (int i = 0; i < n; i++)
+            {
+                if (!m_ObjectPool[i].IsInUse) numberOfPoolMembersNotHidden++;
+            }
+            return numberOfPoolMembersNotHidden;
+        }
     }
 }

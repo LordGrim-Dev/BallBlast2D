@@ -11,6 +11,7 @@ namespace BallBlast.UI
         eIntroUI = 1001,
         eCounterUI = 1002,
         eGamePlayUI,
+        eLevelUP,
         eGameOverUI
 
     }

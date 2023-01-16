@@ -29,8 +29,11 @@ namespace BallBlast
 
         Tween m_PlayerBaseBlink, m_GunBaseBlink;
 
+        private int m_PlayerTweenID;
         public void Init()
         {
+            m_PlayerTweenID = (int)DateTime.Now.Ticks;
+
             m_FireCooldownTime = BBConstants.k_MAX_FIRE_COOLDOWN;
             m_FireAllowed = false;
 
@@ -117,7 +120,8 @@ namespace BallBlast
         private void UpdatePlayerX(float inDistance)
         {
             float moveSpeed = 0.10f;
-            transform.DOMoveX(inDistance, moveSpeed, false).SetEase(Ease.Linear);
+            DOTween.Kill(m_PlayerTweenID);
+            transform.DOMoveX(inDistance, moveSpeed, false).SetEase(Ease.Linear).SetId(m_PlayerTweenID);
         }
 
         private void OnMouseUpEvet()

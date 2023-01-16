@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game.Common;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -28,6 +29,9 @@ namespace BallBlast
             Events.GameEventManager.Instance().OnPlayerLifeLost -= OnPlayerLivesLost;
             Events.GameEventManager.Instance().OnPlayerLifeLost += OnPlayerLivesLost;
 
+            Events.GameEventManager.Instance().OnLevelUp -= OnCurrentLevelCompleted;
+            Events.GameEventManager.Instance().OnLevelUp += OnCurrentLevelCompleted;
+
             InputManager.Instance();
 
             BBManagerMediator mediator = BBManagerMediator.Instance();
@@ -35,7 +39,10 @@ namespace BallBlast
             BBScreenSize.Instance().Init(mediator.MainCamera.Camera);
         }
 
-
+        private void OnCurrentLevelCompleted(int inCurrentLevel)
+        {
+            
+        }
 
         public void InitialiseAllManagers()
         {
@@ -73,7 +80,11 @@ namespace BallBlast
 
         internal void OnExitGame()
         {
-            
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
 
         internal void OnGamePause(bool inPauseStatue)
