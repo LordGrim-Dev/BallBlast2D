@@ -57,6 +57,13 @@ namespace BallBlast.UI
 
         }
 
+        internal void ShowLevelUpUI(int inLevel, Action inLevelUpAnimationStart, Action inLevelUpAnimationComplete)
+        {
+            var ui = UserInterfaceSystem.Instance().LoadUI<LevelUpUI>((uint)UserInterface.eLevelUP);
+
+            UserInterfaceSystem.Instance().ShowUi(ui, inOrder: 5);
+        }
+
 
     }
 }
