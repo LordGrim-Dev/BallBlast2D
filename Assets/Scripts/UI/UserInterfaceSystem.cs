@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BallBlast.UI
 {
-    public enum UserInterface
+    public enum UserInterface : uint
     {
         eIntroUI = 1001,
         eCounterUI = 1002,

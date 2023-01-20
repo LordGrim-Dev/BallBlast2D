@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.UIElements;
 using System;
+using UnityEngine.UI;
 
 namespace BallBlast.UI
 {
@@ -21,24 +21,28 @@ namespace BallBlast.UI
         Image m_NumberBG;
 
         private int m_TargetLevelCount;
-        Action m_AnimationStarted, m_AnimationCompleted;
-
-        public void Initialise(int inTargetLevelCount, Action inAnimationAtrted, Action inAnimationCompleted)
-        {
-            m_AnimationStarted = inAnimationAtrted;
-            m_AnimationCompleted = inAnimationCompleted;
-            m_TargetLevelCount = inTargetLevelCount;
-        }
+        Action m_AnimationStarted;
 
         private void OnEnable()
         {
-            m_TargetLevelCount = 0;
-
             m_LevelHeader.text = config.BBConfigManager.Instance().GetLocalisedStringForKey(config.ConfigJsonConstants.kLevel);
 
             m_LevelCount.transform.DOKill();
 
+            m_NumberBG.fillAmount = 1;
+
             StartCoroutine(StartAnimation());
+        }
+
+        //Called before Starting animation
+        public void Initialise(int inTargetLevelCount, Action inAnimationAtrted)
+        {
+            m_AnimationStarted = inAnimationAtrted;
+
+
+            m_TargetLevelCount = inTargetLevelCount;
+
+            m_LevelCount.text = (inTargetLevelCount - 1).ToString();
         }
 
 
@@ -47,11 +51,21 @@ namespace BallBlast.UI
             yield return null;
             m_LevelHeader.transform.DOKill();
 
-            m_LevelCount.DOFill
+            float duration = 1;
+            m_NumberBG.DOFillAmount(0, duration).SetEase(Ease.OutBack).
+            OnStart(() => m_AnimationStarted?.Invoke()).
+            OnComplete(() =>
+            {
+                m_NumberBG.DOFillAmount(1, duration).SetEase(Ease.InBack).OnComplete(() =>
+                {
+                    BBUIManager.Instance().OnLevelUpAnimationCompleted();
+                    ResetChanges();
+                });
+            });
 
         }
 
-        private void ResetChanges(Color inOriginalcolor)
+        private void ResetChanges()
         {
             m_LevelHeader.transform.DOKill();
             transform.localScale = Vector3.one;

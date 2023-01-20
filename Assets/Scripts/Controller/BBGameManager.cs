@@ -16,6 +16,17 @@ namespace BallBlast
         public bool IsGameStarted { get; private set; }
         public bool IsGameOver { get; private set; }
 
+        public void InitialiseAllManagers()
+        {
+            BBManagerMediator mediator = BBManagerMediator.Instance();
+            mediator.PlayerController.Init();
+            mediator.BulletManagerMB.Init();
+            mediator.BallManagerMB.Init();
+            mediator.BorderRefHolderMB.Init();
+
+            UI.BBUIManager.Instance().ShowIntroUI();
+        }
+
         public override void Init()
         {
             IsGameOver = IsGameStarted = IsGamePause = false;
@@ -29,30 +40,11 @@ namespace BallBlast
             Events.GameEventManager.Instance().OnPlayerLifeLost -= OnPlayerLivesLost;
             Events.GameEventManager.Instance().OnPlayerLifeLost += OnPlayerLivesLost;
 
-            Events.GameEventManager.Instance().OnLevelUp -= OnCurrentLevelCompleted;
-            Events.GameEventManager.Instance().OnLevelUp += OnCurrentLevelCompleted;
-
             InputManager.Instance();
 
             BBManagerMediator mediator = BBManagerMediator.Instance();
             mediator.ProgressManager.Init();
             BBScreenSize.Instance().Init(mediator.MainCamera.Camera);
-        }
-
-        private void OnCurrentLevelCompleted(int inCurrentLevel)
-        {
-            
-        }
-
-        public void InitialiseAllManagers()
-        {
-            BBManagerMediator mediator = BBManagerMediator.Instance();
-            mediator.PlayerController.Init();
-            mediator.BulletManagerMB.Init();
-            mediator.BallManagerMB.Init();
-            mediator.BorderRefHolderMB.Init();
-
-            UI.BBUIManager.Instance().ShowIntroUI();
         }
 
         //Called when and all counter UI is enabled and Counter become zero
@@ -67,10 +59,32 @@ namespace BallBlast
             {
                 BBManagerMediator mediator = BBManagerMediator.Instance();
                 mediator.PlayerController.OnCountDownZero();
-                InputManager.Instance().PauseUpdate(false);
-                BBBallManager.Instance().PauseAll(false);
-                BBBulletManager.Instance().PauseAll(false);
+                PauseManagers(false);
             }
+        }
+
+        internal void OnGamePause(bool inPauseStatue)
+        {
+            IsGamePause = inPauseStatue;
+            Events.GameEventManager.Instance().TriggerPause(inPauseStatue);
+        }
+
+
+        public void OnLevelUp(int inCurrentLevel)
+        {
+            UI.BBUIManager.Instance().ShowLevelUpUI(inCurrentLevel, null);
+            PauseManagers(true);
+        }
+
+        internal void OnLevelUpAnimationCompleted()
+        {
+            PauseManagers(false);
+            LoadNextLevel();
+        }
+
+        private void LoadNextLevel()
+        {
+            Events.GameEventManager.Instance().TriggerLoadNextLevel();
         }
 
         public void OnUpdate()
@@ -87,11 +101,6 @@ namespace BallBlast
 #endif
         }
 
-        internal void OnGamePause(bool inPauseStatue)
-        {
-            IsGamePause = inPauseStatue;
-            Events.GameEventManager.Instance().TriggerPause(inPauseStatue);
-        }
 
         internal void OnPlayerLivesLost(int inPlayerLivesLeft)
         {
@@ -102,12 +111,17 @@ namespace BallBlast
             }
             else
             {
-                InputManager.Instance().PauseUpdate(true);
-                BBBallManager.Instance().PauseAll(true);
-                BBBulletManager.Instance().PauseAll(true);
+                PauseManagers(true);
                 UI.BBUIManager.Instance().ShowCountDownUI();
             }
             Events.UI.UIEventManager.Instance().TriggerPlayerLivesUpdate(inPlayerLivesLeft);
+        }
+
+        private void PauseManagers(bool inPauseStatus)
+        {
+            InputManager.Instance().PauseUpdate(inPauseStatus);
+            BBBallManager.Instance().PauseAll(inPauseStatus);
+            BBBulletManager.Instance().PauseAll(inPauseStatus);
         }
 
         internal void OnGameOver()
@@ -117,15 +131,6 @@ namespace BallBlast
             UI.BBUIManager.Instance().ShowGameOverUI();
         }
 
-        internal config.LevelDetails GetCurrentLevelData()
-        {
-            config.LevelDetails levelData;
-
-            int cureentLevel = BBManagerMediator.Instance().ProgressManager.PlayerCurrentLevel;
-            levelData = config.BBConfigManager.Instance().GetCurrentLevelData(cureentLevel);
-
-            return levelData;
-        }
         public override void OnDestroy()
         {
             base.OnDestroy();

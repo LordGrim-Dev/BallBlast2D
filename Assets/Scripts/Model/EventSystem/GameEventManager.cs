@@ -14,9 +14,9 @@ namespace BallBlast.Events
 
         public event Action OnLevelCompleted;
 
-        public event Action<int> OnLevelUp;
-
         public event Action<int> OnPlayerLifeLost;
+
+        public event Action OnLoadNextLevel;
 
         internal void TriggerPause(bool pauseStatus)
         {
@@ -50,14 +50,6 @@ namespace BallBlast.Events
             OnLevelCompleted?.Invoke();
         }
 
-        internal void TriggerLevelUp(int inNextLevel)
-        {
-#if DEBUG
-            GameUtilities.ShowLog("TriggerLevelUp");
-#endif
-            OnLevelUp?.Invoke(inNextLevel);
-        }
-
         public void TriggerPlayerLifeLost(int inRemainingLive)
         {
 #if DEBUG
@@ -65,5 +57,16 @@ namespace BallBlast.Events
 #endif
             OnPlayerLifeLost?.Invoke(inRemainingLive);
         }
+
+
+
+        public void TriggerLoadNextLevel()
+        {
+#if DEBUG
+            GameUtilities.ShowLog($"TriggerLoadNextLevel :");
+#endif
+            OnLoadNextLevel?.Invoke();
+        }
+
     }
 }

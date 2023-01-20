@@ -96,12 +96,18 @@ namespace Game.Common
         public int GetAllEnabledPoolMemberCount()
         {
             int numberOfPoolMembersNotHidden = 0;
-            int n = m_ObjectPool.Count;
-            for (int i = 0; i < n; i++)
-            {
-                if (!m_ObjectPool[i].IsInUse) numberOfPoolMembersNotHidden++;
-            }
+            foreach (var poolMem in m_ObjectPool)
+                if (!poolMem.Value.IsInUse) numberOfPoolMembersNotHidden++;
+
             return numberOfPoolMembersNotHidden;
+        }
+
+        public void HideAll()
+        {
+            foreach (var poolMem in m_ObjectPool)
+            {
+                poolMem.Value.Hide();
+            }
         }
     }
 }

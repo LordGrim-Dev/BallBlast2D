@@ -19,6 +19,10 @@ namespace BallBlast
 
             Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
             Events.GameEventManager.Instance().OnGameOver += OnGameOver;
+
+            Events.GameEventManager.Instance().OnLevelCompleted -= Reset;
+            Events.GameEventManager.Instance().OnLevelCompleted += Reset;
+
         }
 
         private void OnGameOver()
@@ -94,6 +98,11 @@ namespace BallBlast
         public void PauseAll(bool inPauseStatus)
         {
             m_BulletPoolManager.OnPause(inPauseStatus);
+        }
+
+        private void Reset()
+        {
+            m_BulletPoolManager.HideAll();
         }
     }
 }

@@ -71,6 +71,16 @@ namespace BallBlast.config
 
         }
 
+        internal config.LevelDetails GetCurrentLevelData()
+        {
+            config.LevelDetails levelData;
+
+            int cureentLevel = BBManagerMediator.Instance().ProgressManager.PlayerCurrentLevel;
+            levelData = config.BBConfigManager.Instance().GetCurrentLevelData(cureentLevel);
+
+            return levelData;
+        }
+
         public string GetLocalisedStringForKey(string inKey)
         {
             string localisedString = inKey.ToUpper();

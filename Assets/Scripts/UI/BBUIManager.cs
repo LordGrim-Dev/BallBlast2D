@@ -28,6 +28,7 @@ namespace BallBlast.UI
         public void OnClickContinue()
         {
             UserInterfaceSystem.Instance().HideUI((uint)UserInterface.eIntroUI);
+
             ShowCountDownUI();
         }
 
@@ -57,11 +58,21 @@ namespace BallBlast.UI
 
         }
 
-        internal void ShowLevelUpUI(int inLevel, Action inLevelUpAnimationStart, Action inLevelUpAnimationComplete)
+        internal void ShowLevelUpUI(int inLevel, Action inLevelUpAnimationStart)
         {
             var ui = UserInterfaceSystem.Instance().LoadUI<LevelUpUI>((uint)UserInterface.eLevelUP);
 
+            ui.Initialise(inLevel, inLevelUpAnimationStart);
+
             UserInterfaceSystem.Instance().ShowUi(ui, inOrder: 5);
+        }
+
+
+        internal void OnLevelUpAnimationCompleted()
+        {
+            UserInterfaceSystem.Instance().HideUI((uint)UserInterface.eLevelUP);
+
+            BBGameManager.Instance().OnLevelUpAnimationCompleted();
         }
 
 

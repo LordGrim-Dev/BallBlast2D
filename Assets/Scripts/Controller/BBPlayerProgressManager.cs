@@ -23,7 +23,7 @@ namespace BallBlast
 
             eventManage.OnGameOver -= SavePlayerProgress;
             eventManage.OnGameOver += SavePlayerProgress;
-            
+
             LoadSavedData();
         }
 
@@ -31,7 +31,7 @@ namespace BallBlast
         private void OnLevelCompleted()
         {
             m_PlayerCurrentLevel += 1;
-            Events.GameEventManager.Instance().TriggerLevelUp(m_PlayerCurrentLevel);
+            BBGameManager.Instance().OnLevelUp(m_PlayerCurrentLevel);
         }
 
         private void LoadSavedData()

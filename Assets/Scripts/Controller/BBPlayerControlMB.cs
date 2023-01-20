@@ -52,9 +52,21 @@ namespace BallBlast
             Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
             Events.GameEventManager.Instance().OnGameOver += OnGameOver;
 
+            Events.GameEventManager.Instance().OnLevelCompleted -= OnLevelCompleted;
+            Events.GameEventManager.Instance().OnLevelCompleted += OnLevelCompleted;
+
+            Events.GameEventManager.Instance().OnLoadNextLevel -= OnLoadNextLevel;
+            Events.GameEventManager.Instance().OnLoadNextLevel += OnLoadNextLevel;
+
             m_PlayerTotalLives = config.BBConfigManager.Instance().GameSetting.MaxLives;
             Events.UI.UIEventManager.Instance().TriggerPlayerLivesUpdate(m_PlayerTotalLives);
 
+            CacheTweeningAnimation();
+        }
+
+
+        private void CacheTweeningAnimation()
+        {
             Color endColor = m_PlayerBase.color;
             endColor.a = 0.5f;
             float duration = 0.55f;
@@ -182,6 +194,16 @@ namespace BallBlast
             {
                 OnLivesLost();
             }
+        }
+
+        private void OnLevelCompleted()
+        {
+            EnablePlayerControl(false);
+        }
+
+        private void OnLoadNextLevel()
+        {
+            EnablePlayerControl(false);
         }
 
         public void OnCountDownZero()

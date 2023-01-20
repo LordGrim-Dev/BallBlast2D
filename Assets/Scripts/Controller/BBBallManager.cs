@@ -15,7 +15,7 @@ namespace BallBlast
 
         private float m_SpawnTimeGap;
 
-        private bool m_IsGamePaused;
+        private bool m_IsGamePaused, m_SpawnAllowed;
 
         // These two variable used to monitor level up
         // Max-Count = maximum count for the level to clear up
@@ -31,13 +31,14 @@ namespace BallBlast
             m_ParentBallPool = new ObjectPoolManager<BBBall>(inInstance.ParentBall, inInstance.transform);
             m_SplitBallPool = new ObjectPoolManager<BBBall>(inInstance.SplitBall, inInstance.transform);
 
-            CacheCurrentLevelData();
+            OnLoadNextLevel();
 
             m_TotalParentBallOnScreen = 0;
             m_SpawnTimeGap = BBConstants.k_MAX_SPAWN_TIME_GAP;
 
             m_IsGamePaused = false;
             m_IsLevelUpRequired = false;
+            m_SpawnAllowed = true;
 
             Events.GameEventManager.Instance().OnGamePause -= OnPauseGame;
             Events.GameEventManager.Instance().OnGamePause += OnPauseGame;
@@ -50,6 +51,14 @@ namespace BallBlast
 
             Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
             Events.GameEventManager.Instance().OnGameOver += OnGameOver;
+
+            Events.GameEventManager.Instance().OnLevelCompleted -= HideAll;
+            Events.GameEventManager.Instance().OnLevelCompleted += HideAll;
+
+
+            Events.GameEventManager.Instance().OnLoadNextLevel -= OnLoadNextLevel;
+            Events.GameEventManager.Instance().OnLoadNextLevel += OnLoadNextLevel;
+
         }
 
         private void OnGameOver()
@@ -65,9 +74,11 @@ namespace BallBlast
             m_SplitBallPool.OnPause(inPauseStatus);
         }
 
-        private void CacheCurrentLevelData()
+        private void OnLoadNextLevel()
         {
-            var currentLevelD = BBGameManager.Instance().GetCurrentLevelData();
+            m_SpawnAllowed = true;
+            
+            var currentLevelD = config.BBConfigManager.Instance().GetCurrentLevelData();
 
             m_MaxCountForTheLevel = currentLevelD.MaxCount;
             m_BallSizeProbabality = currentLevelD.BallSizeProbability;
@@ -92,7 +103,7 @@ namespace BallBlast
             bool nextSpawnIsRequired = false;
             while (true)
             {
-                if (m_IsGamePaused) yield return null;
+                if (m_IsGamePaused || !m_SpawnAllowed) yield return null;
 
                 m_IsLevelUpRequired = !(m_CurrentLevelDrawCountPending > 1);
 
@@ -190,11 +201,6 @@ namespace BallBlast
             }
         }
 
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            m_ParentBallPool = m_SplitBallPool = null;
-        }
 
         internal void CheckForSplitAndSpawn(uint inMaxHitCount, Vector3 inParentPos, BallSize inCurrentBallSize)
         {
@@ -275,6 +281,14 @@ namespace BallBlast
             return size;
         }
 
+
+        private void HideAll()
+        {
+            m_SpawnAllowed = false;
+            m_SplitBallPool.HideAll();
+            m_ParentBallPool.HideAll();
+        }
+
         private uint GetMaxHitCount()
         {
             uint nextBallHitCount;
@@ -288,6 +302,12 @@ namespace BallBlast
         private float GetZOrderValue()
         {
             return UnityEngine.Random.Range(-0.1f, -1f);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            m_ParentBallPool = m_SplitBallPool = null;
         }
     }
 }
