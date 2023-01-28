@@ -22,7 +22,6 @@ namespace BallBlast
 
         protected bool m_IsBallBouncingTowardsRight;
 
-        [SerializeField]
         protected uint m_MaxBalHitCountToSplit, m_BallHitCounter;
         public bool IsInUse => m_IsInUse;
 
