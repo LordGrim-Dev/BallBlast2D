@@ -50,7 +50,7 @@ namespace BallBlast.UI
             m_LevelHeader.transform.DOKill();
             yield return null;
 
-            float duration = 1;
+            float duration = 2;
             m_NumberBG.DOFillAmount(0, duration).SetEase(Ease.Linear).
             OnStart(() => m_AnimationStarted?.Invoke()).
             OnComplete(() =>

@@ -9,9 +9,11 @@ namespace Game.Common
 
         public const float k_MAX_XVELOCITY = 6.25f;
 
-        public const float k_MAX_SPAWN_TIME_GAP = 3.5f;
+        public const float k_MAX_SPAWN_TIME_GAP = 2.5f;
 
         public const int k_MAX_PARENT_BALLS_ON_SCREEN = 1;
+        
+        public const int k_MAX_SPLIT_BALLS_ON_SCREEN = 4;
 
         public const int k_SPLIT_BALL_INIT_X_VELOCITY = 4;
 

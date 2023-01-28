@@ -107,7 +107,11 @@ namespace BallBlast
 
                 m_IsLevelUpRequired = !(m_CurrentLevelDrawCountPending > 1);
 
-                nextSpawnIsRequired = m_TotalParentBallOnScreen < BBConstants.k_MAX_PARENT_BALLS_ON_SCREEN && !m_IsLevelUpRequired;
+                bool isChildBallCountReachedMax = m_SplitBallsOnScreen < BBConstants.k_MAX_SPLIT_BALLS_ON_SCREEN;
+                bool isParentballReachedMax = m_TotalParentBallOnScreen < BBConstants.k_MAX_PARENT_BALLS_ON_SCREEN;
+
+                nextSpawnIsRequired = isParentballReachedMax && !m_IsLevelUpRequired && isChildBallCountReachedMax;
+
                 if (nextSpawnIsRequired)
                 {
                     if (m_SpawnTimeGap <= 0)
@@ -170,7 +174,7 @@ namespace BallBlast
                                     && m_IsLevelUpRequired && (m_SplitBallsOnScreen <= 0));
 
 #if DEBUG
-            string log = $"parentballCount : {ParentBallFromPoolEnabled} , childCountsEnabled : {childCountsEnabled} ,m_IsLevelUpRequired: {m_IsLevelUpRequired} , m_SplitBallsOnScreen: {m_SplitBallsOnScreen}";
+            string log = $"parentballCount : {ParentBallFromPoolEnabled} , childCountsEnabled : {childCountsEnabled} ,m_IsLevelUpRequired: {m_IsLevelUpRequired} , m_m_SplitBallsOnScreen: {m_SplitBallsOnScreen}";
             GameUtilities.ShowLog(log);
 #endif
 
@@ -213,13 +217,14 @@ namespace BallBlast
         }
 
 
-        internal void CheckForSplitAndSpawn(uint inMaxHitCount, Vector3 inParentPos, BallSize inCurrentBallSize)
+        internal void CheckForSplitAndSpawn(uint inID, uint inMaxHitCount, Vector3 inParentPos, BallSize inCurrentBallSize)
         {
+            if (inID == BBConstants.k_SPLIT_BALL_ID)
+                OnSplitBallDeath();
+
             uint hitCountForSplitBall = inMaxHitCount / 2;
             if (hitCountForSplitBall > 1)
             {
-                OnSplitBallDeath();
-
                 int numberOfSpawnForSplit = 2;
                 bool toLeft = false;
                 float xVelocity;
@@ -244,16 +249,17 @@ namespace BallBlast
                     toLeft = !toLeft;
 
                 }
-                
+
                 m_SplitBallsOnScreen += numberOfSpawnForSplit;
             }
+
         }
 
         private void OnSplitBallDeath()
         {
             m_SplitBallsOnScreen--;
 
-            m_SplitBallsOnScreen = m_SplitBallsOnScreen <= 0 ? 0 : m_SplitBallsOnScreen;
+            m_SplitBallsOnScreen = m_SplitBallsOnScreen < 0 ? 0 : m_SplitBallsOnScreen;
         }
 
         public bool IsHitBallID(int inId)

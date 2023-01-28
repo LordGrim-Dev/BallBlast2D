@@ -20,7 +20,7 @@ namespace BallBlast
                 var currentScale = transform.localScale;
                 Hide();
                 BBBallManager.Instance().OnBallDeath(BallID);
-                BBBallManager.Instance().CheckForSplitAndSpawn(m_MaxBalHitCountToSplit, currentPosition, CurrentBallSizeLevel);
+                BBBallManager.Instance().CheckForSplitAndSpawn(BallID, m_MaxBalHitCountToSplit, currentPosition, CurrentBallSizeLevel);
             }
         }
 

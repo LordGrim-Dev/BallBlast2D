@@ -29,7 +29,7 @@ namespace BallBlast
 
                     CurrentBallSizeLevel = decresedSize == BallSize.eLevel_0 ? BallSize.eLevel_0 : decresedSize;
                     Hide();
-                    BBBallManager.Instance().CheckForSplitAndSpawn(m_MaxBalHitCountToSplit, currentPosition, CurrentBallSizeLevel);
+                    BBBallManager.Instance().CheckForSplitAndSpawn(BallID, m_MaxBalHitCountToSplit, currentPosition, CurrentBallSizeLevel);
                 }
             }
         }
