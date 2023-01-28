@@ -15,13 +15,10 @@ namespace BallBlast
 
         private float m_MaxPlayerBound;
 
-        [SerializeField]
         private float m_FireCooldownTime;
 
         [SerializeField]
         SpriteRenderer m_PlayerBase, m_GunPoint;
-
-        [SerializeField]
 
         private bool m_FireAllowed;
 
