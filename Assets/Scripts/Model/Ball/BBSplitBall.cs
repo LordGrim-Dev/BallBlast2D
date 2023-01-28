@@ -13,7 +13,7 @@ namespace BallBlast
         {
             base.OnHitBullet(inDamage);
 
-            if (m_MaxBalHitCountToSplit <= 1 || CurrentBallSizeLevel == BallSize.eLevel_0)
+            if (CurrentBallSizeLevel == BallSize.eLevel_0 && m_BallHitCounter >= m_MaxBalHitCountToSplit)
             {
                 Hide();
                 BBBallManager.Instance().OnBallDeath(BallID);
@@ -24,7 +24,10 @@ namespace BallBlast
                 {
                     var currentPosition = transform.position;
                     var scale = transform.localScale;
-                    CurrentBallSizeLevel = (BallSize)((int)(CurrentBallSizeLevel - 1));
+
+                    BallSize decresedSize = CurrentBallSizeLevel - 1;
+
+                    CurrentBallSizeLevel = decresedSize == BallSize.eLevel_0 ? BallSize.eLevel_0 : decresedSize;
                     Hide();
                     BBBallManager.Instance().CheckForSplitAndSpawn(m_MaxBalHitCountToSplit, currentPosition, CurrentBallSizeLevel);
                 }

@@ -11,7 +11,7 @@ namespace BallBlast
 
         ObjectPoolManager<BBBall> m_SplitBallPool;
 
-        private int m_TotalParentBallOnScreen;
+        private int m_TotalParentBallOnScreen, m_SplitBallsOnScreen;
 
         private float m_SpawnTimeGap;
 
@@ -33,7 +33,7 @@ namespace BallBlast
 
             OnLoadNextLevel();
 
-            m_TotalParentBallOnScreen = 0;
+            m_TotalParentBallOnScreen = m_SplitBallsOnScreen = 0;
             m_SpawnTimeGap = BBConstants.k_MAX_SPAWN_TIME_GAP;
 
             m_IsGamePaused = false;
@@ -122,7 +122,7 @@ namespace BallBlast
             }
         }
 
-        public void SpawnParentBall()
+        private void SpawnParentBall()
         {
             m_TotalParentBallOnScreen++;
             Vector3 randomPosition = GetBallSpawnPoint();
@@ -156,13 +156,24 @@ namespace BallBlast
             if (inId == BBConstants.k_PARENT_BALL_ID)
             {
                 m_TotalParentBallOnScreen--;
-                if (m_TotalParentBallOnScreen <= 0) m_TotalParentBallOnScreen = 0;
+
+                m_TotalParentBallOnScreen = m_TotalParentBallOnScreen <= 0 ? 0 : m_TotalParentBallOnScreen;
+            }
+            else if (inId == BBConstants.k_SPLIT_BALL_ID)
+            {
+                OnSplitBallDeath();
             }
 
-            int parentballCount = m_ParentBallPool.GetAllEnabledPoolMemberCount();
+            int ParentBallFromPoolEnabled = m_ParentBallPool.GetAllEnabledPoolMemberCount();
             int childCountsEnabled = m_SplitBallPool.GetAllEnabledPoolMemberCount();
-            bool levelCompleted = (parentballCount == 0 && childCountsEnabled == 0 && m_IsLevelUpRequired);
-            
+            bool levelCompleted = (ParentBallFromPoolEnabled == 0 && childCountsEnabled == 0
+                                    && m_IsLevelUpRequired && (m_SplitBallsOnScreen <= 0));
+
+#if DEBUG
+            string log = $"parentballCount : {ParentBallFromPoolEnabled} , childCountsEnabled : {childCountsEnabled} ,m_IsLevelUpRequired: {m_IsLevelUpRequired} , m_SplitBallsOnScreen: {m_SplitBallsOnScreen}";
+            GameUtilities.ShowLog(log);
+#endif
+
             if (levelCompleted)
                 Events.GameEventManager.Instance().TriggerLevelCompleted();
         }
@@ -204,8 +215,11 @@ namespace BallBlast
 
         internal void CheckForSplitAndSpawn(uint inMaxHitCount, Vector3 inParentPos, BallSize inCurrentBallSize)
         {
-            if (inMaxHitCount > 0)
+            uint hitCountForSplitBall = inMaxHitCount / 2;
+            if (hitCountForSplitBall > 1)
             {
+                OnSplitBallDeath();
+
                 int numberOfSpawnForSplit = 2;
                 bool toLeft = false;
                 float xVelocity;
@@ -226,10 +240,20 @@ namespace BallBlast
 
                     postion.z = GetZOrderValue();
 
-                    ballProperties.InitialiseNewBall(inMaxHitCount / 2, postion, inCurrentBallSize, xVelocity);
+                    ballProperties.InitialiseNewBall(hitCountForSplitBall, postion, inCurrentBallSize, xVelocity);
                     toLeft = !toLeft;
+
                 }
+                
+                m_SplitBallsOnScreen += numberOfSpawnForSplit;
             }
+        }
+
+        private void OnSplitBallDeath()
+        {
+            m_SplitBallsOnScreen--;
+
+            m_SplitBallsOnScreen = m_SplitBallsOnScreen <= 0 ? 0 : m_SplitBallsOnScreen;
         }
 
         public bool IsHitBallID(int inId)
@@ -244,7 +268,7 @@ namespace BallBlast
             return poolMember != null;
         }
 
-        public BallSize GetNextBallSize()
+        private BallSize GetNextBallSize()
         {
             BallSize size = BallSize.eLevel_0;
 

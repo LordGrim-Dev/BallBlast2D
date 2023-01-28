@@ -198,23 +198,23 @@ namespace BallBlast
 
         private float GetBounceForce()
         {
-            float bounceForce = 30;
+            float bounceForce = 25;
             switch (CurrentBallSizeLevel)
             {
                 case BallSize.eLevel_0:
-                    bounceForce = 32f;
+                    bounceForce = 29f;
                     break;
 
                 case BallSize.eLevel_1:
-                    bounceForce = 35f;
+                    bounceForce = 31f;
                     break;
 
                 case BallSize.eLevel_2:
-                    bounceForce = 37f;
+                    bounceForce = 35f;
                     break;
 
                 case BallSize.eLevel_3:
-                    bounceForce = 45f;
+                    bounceForce = 40f;
                     break;
             }
 
