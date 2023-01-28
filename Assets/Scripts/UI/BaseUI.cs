@@ -12,6 +12,16 @@ namespace BallBlast.UI
         [SerializeField]
         GameObject m_BackgroundHolder;
 
+        private void Start()
+        {
+            Initialise();
+        }
+
+        protected virtual void Initialise()
+        {
+
+        }
+
         public void SetUpBackroundSize(Vector2 inSize)
         {
 #if DEBUG

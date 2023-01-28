@@ -67,6 +67,7 @@ MonoBehaviour:
   m_BackgroundHolder: {fileID: 1892840003002739041}
   m_LevelHeader: {fileID: 6969827918960718941}
   m_LevelCount: {fileID: 1892840003557708224}
+  m_NumberBG: {fileID: 8017821285918244813}
 --- !u!1 &1892840003557708226
 GameObject:
   m_ObjectHideFlags: 0

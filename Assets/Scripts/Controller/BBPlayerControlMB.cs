@@ -203,7 +203,7 @@ namespace BallBlast
 
         private void OnLoadNextLevel()
         {
-            EnablePlayerControl(false);
+            EnablePlayerControl(true);
         }
 
         public void OnCountDownZero()

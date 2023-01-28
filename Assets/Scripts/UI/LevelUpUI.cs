@@ -39,7 +39,6 @@ namespace BallBlast.UI
         {
             m_AnimationStarted = inAnimationAtrted;
 
-
             m_TargetLevelCount = inTargetLevelCount;
 
             m_LevelCount.text = (inTargetLevelCount - 1).ToString();
@@ -48,15 +47,15 @@ namespace BallBlast.UI
 
         private IEnumerator StartAnimation()
         {
-            yield return null;
             m_LevelHeader.transform.DOKill();
+            yield return null;
 
             float duration = 1;
-            m_NumberBG.DOFillAmount(0, duration).SetEase(Ease.OutBack).
+            m_NumberBG.DOFillAmount(0, duration).SetEase(Ease.Linear).
             OnStart(() => m_AnimationStarted?.Invoke()).
             OnComplete(() =>
             {
-                m_NumberBG.DOFillAmount(1, duration).SetEase(Ease.InBack).OnComplete(() =>
+                m_NumberBG.DOFillAmount(1, duration).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     BBUIManager.Instance().OnLevelUpAnimationCompleted();
                     ResetChanges();

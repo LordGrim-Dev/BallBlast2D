@@ -97,7 +97,7 @@ namespace Game.Common
         {
             int numberOfPoolMembersNotHidden = 0;
             foreach (var poolMem in m_ObjectPool)
-                if (!poolMem.Value.IsInUse) numberOfPoolMembersNotHidden++;
+                if (poolMem.Value.IsInUse) numberOfPoolMembersNotHidden++;
 
             return numberOfPoolMembersNotHidden;
         }

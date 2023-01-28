@@ -72,6 +72,11 @@ namespace BallBlast.UI
         {
             UserInterfaceSystem.Instance().HideUI((uint)UserInterface.eLevelUP);
 
+            var ui = (GamePlayUI)UserInterfaceSystem.Instance().GetUI(UserInterface.eGamePlayUI);
+
+            int currentLevel = BBManagerMediator.Instance().ProgressManager.PlayerCurrentLevel;
+            ui.OnLevelUP(currentLevel);
+
             BBGameManager.Instance().OnLevelUpAnimationCompleted();
         }
 

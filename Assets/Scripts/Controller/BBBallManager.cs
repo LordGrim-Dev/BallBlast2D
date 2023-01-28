@@ -77,7 +77,7 @@ namespace BallBlast
         private void OnLoadNextLevel()
         {
             m_SpawnAllowed = true;
-            
+
             var currentLevelD = config.BBConfigManager.Instance().GetCurrentLevelData();
 
             m_MaxCountForTheLevel = currentLevelD.MaxCount;
@@ -161,8 +161,8 @@ namespace BallBlast
 
             int parentballCount = m_ParentBallPool.GetAllEnabledPoolMemberCount();
             int childCountsEnabled = m_SplitBallPool.GetAllEnabledPoolMemberCount();
-            bool levelCompleted = (parentballCount == 0 && childCountsEnabled == 0);
-
+            bool levelCompleted = (parentballCount == 0 && childCountsEnabled == 0 && m_IsLevelUpRequired);
+            
             if (levelCompleted)
                 Events.GameEventManager.Instance().TriggerLevelCompleted();
         }

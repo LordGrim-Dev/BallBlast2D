@@ -13,15 +13,18 @@ namespace BallBlast.UI
         TextMeshProUGUI m_ScoreText;
 
         [UnityEngine.SerializeField]
+        TextMeshProUGUI m_ScoreHeader;
+
+        [UnityEngine.SerializeField]
         TextMeshProUGUI m_PlayerLivesLeft;
 
         [SerializeField]
-        Slider m_PowerUpSlider;
+        TextMeshProUGUI m_LevelUpHeader;
 
-        public TextMeshProUGUI ScoreText { get => m_ScoreText; }
-        public TextMeshProUGUI PlayerLivesLeft { get => m_PlayerLivesLeft; }
+        [SerializeField]
+        TextMeshProUGUI m_LevelUpValue;
 
-        
+
         private void OnEnable()
         {
             Events.UI.UIEventManager.Instance().OnPlayerScoreUpdate += OnPlayerScoreUpdate;
@@ -32,6 +35,7 @@ namespace BallBlast.UI
 
             Events.GameEventManager.Instance().OnGameOver += OnGameOver;
         }
+
 
         private void OnDisable()
         {
@@ -44,6 +48,22 @@ namespace BallBlast.UI
             Events.GameEventManager.Instance().OnGameOver -= OnGameOver;
         }
 
+        protected override void Initialise()
+        {
+            var configinstance = config.BBConfigManager.Instance();
+            m_ScoreHeader.text = configinstance.GetLocalisedStringForKey(config.ConfigJsonConstants.kScore);
+            m_LevelUpHeader.text = configinstance.GetLocalisedStringForKey(config.ConfigJsonConstants.kLevel) + " - ";
+
+
+            m_ScoreText.text = "0";
+
+            string lives = configinstance.GameSetting.MaxLives.ToString();
+
+            m_PlayerLivesLeft.text = lives;
+
+            base.Initialise();
+        }
+
         private void OnLivesLeftUpdate(int inLivesLeft)
         {
             string lives = inLivesLeft.ToString();
@@ -52,13 +72,13 @@ namespace BallBlast.UI
             float duration = 0.5f;
             AnimateScaleUp(m_PlayerLivesLeft.transform, duration);
         }
-        
+
 
         private void OnPlayerScoreUpdate(int inScore)
         {
             m_ScoreText.text = inScore.ToString();
         }
-        
+
 
         private void AnimateScaleUp(Transform inTransform, float inDur)
         {
@@ -70,27 +90,23 @@ namespace BallBlast.UI
                 inTransform.localScale = originalScale;
             });
         }
-        
 
-        private void Start()
+        public void OnLevelUP(int inLevel)
         {
-            m_ScoreText.text = "0";
-            string lives = "3";///BallBlast.PMBallBlastManager.Instance().TotalBallBlastLivesLeft.ToString();
-            m_PlayerLivesLeft.text = lives;
+            m_LevelUpValue.text = inLevel.ToString();
         }
-        
-        
+
         private void OnGameOver()
         {
 
         }
-        
+
 
         private void OnGamePause(bool inPause)
         {
 
         }
-        
+
 
 
 

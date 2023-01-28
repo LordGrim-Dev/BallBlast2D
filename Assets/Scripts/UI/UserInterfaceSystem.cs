@@ -112,6 +112,15 @@ namespace BallBlast.UI
             return ui;
         }
 
+        public BaseUI GetUI(UserInterface inUI)
+        {
+            BaseUI ui = null;
+
+            m_UIMapper.TryGetValue((uint)inUI, out ui);
+
+            return ui;
+        }
+
         private void CleanUP()
         {
             foreach (KeyValuePair<uint, BaseUI> kvp in m_UIMapper)

@@ -5,7 +5,7 @@
             "score": "Score",
             "clk_t_ext": "Click here to Exit...",
             "clk_t_continue": "Click here to Continue...",
-            "level": "Level - {0}"
+            "level": "Level"
         }
     },
     "game_settings": {
