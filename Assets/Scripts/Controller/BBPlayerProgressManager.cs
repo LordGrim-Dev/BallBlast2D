@@ -16,6 +16,8 @@ namespace BallBlast
 
         public void Init()
         {
+            m_PlayerCurrentLevel = 1;
+
             var eventManage = Events.GameEventManager.Instance();
 
             eventManage.OnLevelCompleted -= OnLevelCompleted;
