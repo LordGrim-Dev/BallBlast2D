@@ -77,19 +77,19 @@ namespace BallBlast
             switch (CurrentBallSizeLevel)
             {
                 case BallSize.eLevel_0:
-                    scale = Vector2.one;
+                    scale = Vector2.one * 1.10f;
                     break;
 
                 case BallSize.eLevel_1:
-                    scale = Vector2.one * 1.5f;
+                    scale = Vector2.one * 1.35f;
                     break;
 
                 case BallSize.eLevel_2:
-                    scale = Vector2.one * 1.75f;
+                    scale = Vector2.one * 1.55f;
                     break;
 
                 case BallSize.eLevel_3:
-                    scale = Vector2.one * 2f;
+                    scale = Vector2.one * 1.8f;
                     break;
             }
             transform.localScale = scale;
@@ -165,17 +165,19 @@ namespace BallBlast
 
             outForce = m_BallRigidBody.velocity;
 
+            float xvelocity = GetXVelocity();
+
             if (borderDirection == Direction.eLeft || borderDirection == Direction.eRight)
             {
                 // Left or right Border
                 if (borderDirection == Direction.eRight)
                 {
-                    outForce.x = -BBConstants.k_MAX_XVELOCITY;
+                    outForce.x = -xvelocity;
                     m_IsBallBouncingTowardsRight = false;
                 }
                 else
                 {
-                    outForce.x = BBConstants.k_MAX_XVELOCITY;
+                    outForce.x = xvelocity; 
                     m_IsBallBouncingTowardsRight = true;
                 }
             }
@@ -187,12 +189,42 @@ namespace BallBlast
                 if (borderDirection == Direction.eBottom)
                 {
                     outForce.y = m_MaxYBounceForce;
+
+                    outForce.x = -xvelocity;//Deafult right
+
                     if (m_IsBallBouncingTowardsRight)
-                        outForce.x = BBConstants.k_MAX_XVELOCITY;
-                    else
-                        outForce.x = -BBConstants.k_MAX_XVELOCITY; // To Left
+                        outForce.x = xvelocity;// To Left
                 }
             }
+        }
+
+        private float GetXVelocity()
+        {
+            float xVelocity = BBConstants.k_MAX_XVELOCITY;
+
+            float percentage = 1;
+            switch (CurrentBallSizeLevel)
+            {
+                case BallSize.eLevel_0:
+                    percentage = 0.50f;
+                    break;
+
+                case BallSize.eLevel_1:
+                    percentage = 0.65f;
+                    break;
+
+                case BallSize.eLevel_2:
+                    percentage = 0.80f;
+                    break;
+
+                case BallSize.eLevel_3:
+                    percentage = 1f;
+                    break;
+            }
+
+            xVelocity *= percentage;
+
+            return xVelocity;
         }
 
         private float GetBounceForce()
@@ -205,15 +237,15 @@ namespace BallBlast
                     break;
 
                 case BallSize.eLevel_1:
-                    bounceForce = 31f;
+                    bounceForce = 33f;
                     break;
 
                 case BallSize.eLevel_2:
-                    bounceForce = 35f;
+                    bounceForce = 37f;
                     break;
 
                 case BallSize.eLevel_3:
-                    bounceForce = 40f;
+                    bounceForce = 41f;
                     break;
             }
 
