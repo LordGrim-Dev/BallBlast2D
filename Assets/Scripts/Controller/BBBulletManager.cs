@@ -97,12 +97,18 @@ namespace BallBlast
 
         public void PauseAll(bool inPauseStatus)
         {
-            m_BulletPoolManager.OnPause(inPauseStatus);
+#if DEBUG
+            GameUtilities.ShowLog($" <color=red>NULL..... m_BulletPoolManager : </color>{m_BulletPoolManager == null}");
+#endif
+            m_BulletPoolManager?.OnPause(inPauseStatus);
         }
 
         private void Reset()
         {
-            m_BulletPoolManager.HideAll();
+#if DEBUG
+            GameUtilities.ShowLog($" <color=red>NULL..... m_BulletPoolManager : </color>{m_BulletPoolManager == null}");
+#endif
+            m_BulletPoolManager?.HideAll();
         }
     }
 }

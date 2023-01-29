@@ -55,6 +55,9 @@ namespace BallBlast.UI
             OnStart(() => m_AnimationStarted?.Invoke()).
             OnComplete(() =>
             {
+                m_LevelCount.transform.DOPunchScale(Vector3.one, 0.1f, 5, 1);
+                m_LevelCount.text = m_TargetLevelCount.ToString();
+
                 m_NumberBG.DOFillAmount(1, duration).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     BBUIManager.Instance().OnLevelUpAnimationCompleted();
