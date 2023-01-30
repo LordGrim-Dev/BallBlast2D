@@ -24,10 +24,11 @@ namespace BallBlast
         private uint[] m_BallSizeProbabality;
         Coroutine m_CheckAndSpawnParent;
 
-        bool m_IsLevelUpRequired;
+        bool m_IsLevelUpRequired, m_IsInitialisationComplete;
 
         public void Init(BBBallManagerMB inInstance)
         {
+            m_IsInitialisationComplete = false;
             m_ParentBallPool = new ObjectPoolManager<BBBall>(inInstance.ParentBall, inInstance.transform);
             m_SplitBallPool = new ObjectPoolManager<BBBall>(inInstance.SplitBall, inInstance.transform);
 
@@ -58,6 +59,8 @@ namespace BallBlast
 
             Events.GameEventManager.Instance().OnLoadNextLevel -= OnLoadNextLevel;
             Events.GameEventManager.Instance().OnLoadNextLevel += OnLoadNextLevel;
+
+            m_IsInitialisationComplete = true;
 
         }
 
@@ -103,7 +106,7 @@ namespace BallBlast
             bool nextSpawnIsRequired = false;
             while (true)
             {
-                if (m_IsGamePaused || !m_SpawnAllowed) yield return null;
+                if (m_IsGamePaused || !m_SpawnAllowed || !m_IsInitialisationComplete) yield return null;
 
                 m_IsLevelUpRequired = !(m_CurrentLevelDrawCountPending > 1);
 
