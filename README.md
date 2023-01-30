@@ -5,10 +5,10 @@ Ball Blast is an arcade game where you have to use a cannon to shoot bombs at gi
 
 ![Sample](https://github.com/LordGrim-Dev/BallBlast2D/blob/main/Demo/GameFootage_02.gif)
 
-[Demo](#Demo)
 [Elements](#Elements)  
 [ExternalTools](#ExternalTools)  
 [Contact](#contact)
+[License](#License)
 
 ## BallBlast2D
 A straightforward, hyper-casual game was built as a copy of the Voodo-produced [Ball Blast](https://play.google.com/store/apps/details?id=com.nomonkeys.ballblast).
@@ -25,6 +25,9 @@ This project was developed as a learning exercise. may be used to study the fund
 ## ExternalTools
 * DoTween : http://dotween.demigiant.com/
 * NewtonSoft : https://www.newtonsoft.com/json#
+
+## License
+* Apache License : [license](https://github.com/LordGrim-Dev/BallBlast2D/blob/main/LICENSE)
 
 ## Contact 
 You can contact Fy- by email: devlordgrim@gmail.com
